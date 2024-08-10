@@ -60,9 +60,19 @@ class MiniCPM:
 
     def chat(self, msgs: List[Message], temperature: float = 0.7, seed: Optional[int] = None, max_tokens: int = 4095) -> str:
         try:
-            # Process images in the messages
+            # Process images in the messages and extract system prompt
             processed_msgs = []
+            system_prompt = ''
+            system_message_count = 0
+
             for msg in msgs:
+                if msg.role == 'system':
+                    system_message_count += 1
+                    if system_message_count > 1:
+                        raise ValueError("Only one system message is allowed.")
+                    system_prompt = msg.content if isinstance(msg.content, str) else msg.content[0].text
+                    continue  # Skip adding system message to processed_msgs
+
                 if isinstance(msg.content, list):
                     processed_content = []
                     for item in msg.content:
@@ -82,16 +92,18 @@ class MiniCPM:
             if seed is not None:
                 torch.manual_seed(seed)
 
-            print(processed_msgs)
             # Call the model's chat method
             response = self.model.chat(
                 image=None,
                 msgs=processed_msgs,
                 tokenizer=self.tokenizer,
                 temperature=temperature,
-                max_new_tokens=max_tokens
+                max_new_tokens=max_tokens,
+                system_prompt=system_prompt
             )
             return response
+        except ValueError as ve:
+            raise ve  # Re-raise ValueError for multiple system messages
         except Exception as e:
             raise RuntimeError(f"Chat processing failed: {str(e)}")
 

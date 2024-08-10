@@ -21,6 +21,31 @@ class ChatRequest(BaseModel):
     response_format: ResponseFormat = ResponseFormat()
     max_tokens: int = Field(4095, ge=1, le=8192)
 
+class ToolCall(BaseModel):
+    id: str
+    type: str
+    function: Dict[str, str]
+
+class ResponseMessage(BaseModel):
+    content: Optional[str]
+    refusal: Optional[str]
+    tool_calls: Optional[List[ToolCall]]
+    role: str
+    function_call: Optional[Dict[str, str]]
+
+class LogProbs(BaseModel):
+    content: Optional[List[Dict[str, Union[str, float]]]]
+
+class Choice(BaseModel):
+    finish_reason: str
+    index: int
+    message: ResponseMessage
+    logprobs: Optional[LogProbs]
+
 class ChatResponse(BaseModel):
+    id: str
+    choices: List[Choice]
     model: str
-    response: str
+
+class ErrorResponse(BaseModel):
+    detail: str
