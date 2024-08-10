@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+python-multipart
+Pillow
+torch
+torchvision
+transformers
+sentencepiece
+accelerate
+bitsandbytes
+pydantic_settings
+flash_attn
