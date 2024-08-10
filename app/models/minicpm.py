@@ -1,9 +1,10 @@
 import torch
 import io
 import base64
-from typing import List, Dict, Any, Optional
+from typing import List, Union, Optional
 from PIL import Image
 from transformers import AutoModel, AutoTokenizer
+from app.schemas.chat import Message, MessageContent
 
 
 class MiniCPM:
@@ -57,55 +58,42 @@ class MiniCPM:
         except Exception as e:
             raise RuntimeError(f"Failed to load model: {e}")
 
-    def chat(self, msgs: List[Dict[str, Any]], temperature: float = 0, seed: Optional[int] = None,
-             max_tokens: int = 4095) -> str:
-        """
-        Process a chat request using the MiniCPM model.
-
-        Args:
-            msgs (List[Dict[str, Any]]): List of message dictionaries.
-            temperature (float): Sampling temperature.
-            seed (Optional[int]): Random seed for reproducibility.
-            max_tokens (int): Maximum number of tokens to generate.
-
-        Returns:
-            str: The model's response.
-        """
+    def chat(self, msgs: List[Message], temperature: float = 0.7, seed: Optional[int] = None, max_tokens: int = 4095) -> str:
         try:
             # Process images in the messages
             processed_msgs = []
             for msg in msgs:
-                if isinstance(msg['content'], list):
+                if isinstance(msg.content, list):
                     processed_content = []
-                    for item in msg['content']:
-                        if item['type'] == 'image_url':
+                    for item in msg.content:
+                        if item.type == 'image_url':
                             # Convert base64 to PIL Image
-                            image_data = item['image_url']['url'].split(',')[1]
+                            image_data = item.image_url['url'].split(',')[1]
                             image = Image.open(io.BytesIO(base64.b64decode(image_data))).convert('RGB')
                             processed_content.append(image)
-                        else:
-                            processed_content.append(item['text'])
-                    msg['content'] = processed_content
-                processed_msgs.append(msg)
+                        elif item.type == 'text':
+                            processed_content.append(item.text)
+                    processed_msg = {"role": msg.role, "content": processed_content}
+                else:
+                    processed_msg = {"role": msg.role, "content": msg.content}
+                processed_msgs.append(processed_msg)
 
             # Set random seed if provided
             if seed is not None:
                 torch.manual_seed(seed)
-                if self.device.type == "cuda":
-                    torch.cuda.manual_seed(seed)
 
-            with torch.no_grad():
-                response = self.model.chat(
-                    image=None,
-                    msgs=processed_msgs,
-                    tokenizer=self.tokenizer,
-                    temperature=temperature,
-                    max_new_tokens=max_tokens
-                )
+            print(processed_msgs)
+            # Call the model's chat method
+            response = self.model.chat(
+                image=None,
+                msgs=processed_msgs,
+                tokenizer=self.tokenizer,
+                temperature=temperature,
+                max_new_tokens=max_tokens
+            )
             return response
         except Exception as e:
-            raise RuntimeError(f"Chat processing failed: {e}")
-
+            raise RuntimeError(f"Chat processing failed: {str(e)}")
 
 model_instance = None
 
