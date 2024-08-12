@@ -64,28 +64,40 @@ Generate a chat completion using the MiniCPM model.
 
 ```json
 {
-  "model": "MODEL_NAME",
-  "temperature": 0,
-  "messages": [
-    {
-      "role": "system",
-      "content": "You are a helpful assistant."
-    },
-    {
-      "role": "user",
-      "content": [
+    "model": "MiniCPM-V-2_6",  # This might not be used by your API, but included for compatibility
+    "temperature": 0.1,
+    "messages": [
         {
-          "type": "text",
-          "text": "Hello, how are you?"
+          "role":"system",
+          "content":"You are a good engineer"
+        },
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{image1_base64}"
+                    }
+                },
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{image2_base64}"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": "Compare image 1 and image 2, tell me about the differences between them. Format your response in JSON."
+                }
+            ]
         }
-      ]
-    }
-  ],
-  "seed": 42,
-  "response_format": {
-    "type": "json_object"
-  },
-  "max_tokens": 4095
+    ],
+    "seed": 4,
+    "response_format": {
+        "type": "json_object"
+    },
+    "max_tokens": 4095
 }
 ```
 
@@ -93,18 +105,22 @@ Generate a chat completion using the MiniCPM model.
 
 ```json
 {
-  "id": "chatcmpl-123abc",
+  "id": "7a247d6e-4d3b-4b77-a083-b525c664be58",
   "choices": [
     {
       "finish_reason": "stop",
       "index": 0,
       "message": {
-        "content": "Hello! As an AI assistant, I don't have feelings, but I'm functioning well and ready to help you. How can I assist you today?",
-        "role": "assistant"
-      }
+        "content": "Based on the provided images, here are the differences between image 1 and image 2:\n\n1. **Page Number**:\n   - Image 1: Page number is not visible.\n   - Image 2: Page number \"4 of 36\" is visible at the bottom right corner.\n\n2. **Content Differences**:\n   - The content in both images appears to be identical with respect to text and layout. There are no visible changes or additions in the textual information presented in both images.\n\n3. **Footer Information**:\n   - Both images have a footer that includes the website \"analog.com\".\n   - Both images have a revision control note \"Rev. G\".\n\nIn summary, the primary difference between the two images is the visibility of the page number in image 2, which indicates it is part of a larger document (36 pages).",
+        "refusal": null,
+        "tool_calls": null,
+        "role": "assistant",
+        "function_call": null
+      },
+      "logprobs": null
     }
   ],
-  "model": "MODEL_NAME"
+  "model": "MiniCPM-V-2_6"
 }
 ```
 
