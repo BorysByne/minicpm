@@ -64,7 +64,7 @@ Generate a chat completion using the MiniCPM model.
 
 ```json
 {
-    "model": "MiniCPM-V-2_6",  # This might not be used by your API, but included for compatibility
+    "model": "MiniCPM-V-2_6",  
     "temperature": 0.1,
     "messages": [
         {
@@ -77,13 +77,13 @@ Generate a chat completion using the MiniCPM model.
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": f"data:image/png;base64,{image1_base64}"
+                        "url": "data:image/png;base64,{image1_base64}"
                     }
                 },
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": f"data:image/png;base64,{image2_base64}"
+                        "url": "data:image/png;base64,{image2_base64}"
                     }
                 },
                 {
