@@ -27,7 +27,7 @@ MiniCPM API is a FastAPI-based wrapper around the openbmb/MiniCPM-V-2_6 model. I
 1. Clone the repository:
    ```
    git clone https://github.com/BorysByne/minicpm.git
-   cd minicpm-api
+   cd minicpm
    ```
 
 2. Create and activate a virtual environment:
